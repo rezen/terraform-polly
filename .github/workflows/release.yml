@@ -1,0 +1,20 @@
+name: release
+
+# Uses release-please to open/maintain a release PR from Conventional Commits.
+# Merging that PR tags a semver release (e.g. v0.2.0) that consumers can pin:
+#   source = "github.com/rezen/terraform-polly?ref=v0.2.0"
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v4
+        with:
+          release-type: terraform-module

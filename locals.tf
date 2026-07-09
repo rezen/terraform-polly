@@ -17,13 +17,6 @@ locals {
   # Regex for actions associated with writes
   write_regex = "\\:(?i:Batch|Un|Re)?(?i:${join("|", local.write_verbs)})"
 
-  # Some subsets of functionality are nicely encapsulated with an alias
-  aliases = {
-    "vpc" : [
-      "ec2:DescribeVpc*",
-    ]
-  }
-
   # Defined groups which are used by vars generate policies
   groups = {
     compute = {
@@ -155,6 +148,8 @@ locals {
     for name, value in local.by_group_prepped : name => flatten(value)
   }
 
+  # Keep only actions from filter_actions that are neither wildcards
+  # (e.g. "s3:*", "s3:Get*") nor writes (matched by write_regex).
   filtered_policies  = [for a in var.filter_actions : a if length(try(regex("\\:(\\*|[A-Za-z]+\\*)", a), [])) < 1 && length(try(regex(local.write_regex, a), [])) < 1]
   group_actions      = flatten([for g in var.include_groups : lookup(local.by_group, g, [])])
   before_excludes    = sort(distinct(concat(local.group_actions, var.include_actions, local.filtered_policies)))

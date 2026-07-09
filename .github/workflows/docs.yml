@@ -1,0 +1,25 @@
+name: docs
+
+# Regenerates the <!-- BEGIN_TF_DOCS --> block in README.md and commits
+# the result back to the PR branch when inputs/outputs change.
+on:
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  terraform-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Render terraform-docs and commit
+        uses: terraform-docs/gh-actions@v1
+        with:
+          working-dir: .
+          output-file: README.md
+          output-method: inject
+          git-push: "true"
